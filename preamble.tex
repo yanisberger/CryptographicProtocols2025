@@ -1,0 +1,99 @@
+% preamble.tex
+
+% ============ PACKAGES ============
+% Essential math packages
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{mathtools}
+
+% Cryptography-specific
+\usepackage{cryptocode}  % For protocol notation, games, oracles
+\usepackage{algorithm2e} % For algorithms (alternative: algorithm/algorithmic)
+
+% Formatting and layout
+\usepackage[margin=1in]{geometry}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+
+% Colors and graphics
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{shapes, arrows, positioning}
+
+% References and links
+\usepackage{hyperref}
+\usepackage{cleveref} % For smart references (Theorem 1, Lemma 2, etc.)
+
+% Code listings (if needed)
+\usepackage{listings}
+
+% ============ THEOREM ENVIRONMENTS ============
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{exercise}[theorem]{Exercise}
+
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{note}[theorem]{Note}
+
+% ============ CUSTOM COMMANDS ============
+% Cryptographic notation
+\newcommand{\Gen}{\mathsf{Gen}}
+\newcommand{\Enc}{\mathsf{Enc}}
+\newcommand{\Dec}{\mathsf{Dec}}
+\newcommand{\Sign}{\mathsf{Sign}}
+\newcommand{\Verify}{\mathsf{Verify}}
+\newcommand{\Hash}{\mathsf{Hash}}
+\newcommand{\MAC}{\mathsf{MAC}}
+\newcommand{\KDF}{\mathsf{KDF}}
+
+% Adversaries and oracles
+\newcommand{\Adv}{\mathcal{A}}
+\newcommand{\AdvB}{\mathcal{B}}
+\newcommand{\Oracle}{\mathcal{O}}
+\newcommand{\Sim}{\mathsf{Sim}}
+
+% Security notions
+\newcommand{\negl}{\mathsf{negl}}
+\newcommand{\poly}{\mathsf{poly}}
+%\newcommand{\Pr}{\mathbb{P}}
+
+% Common sets
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\bits}{\{0,1\}}
+
+% Useful shortcuts
+\newcommand{\ZKP}{\text{ZKP}}
+\newcommand{\NIZK}{\text{NIZK}}
+\newcommand{\MPC}{\text{MPC}}
+
+% ============ HYPERREF SETUP ============
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    citecolor=blue,
+    urlcolor=blue
+}
+
+% ============ HEADER/FOOTER ============
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{Cryptographic Protocols}
+\fancyhead[R]{Spring 2025}
+\fancyfoot[C]{\thepage}
+
+% ============ SECTION FORMATTING ============
+\titleformat{\section}
+  {\Large\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}
+  {\large\bfseries}{\thesubsection}{1em}{}
