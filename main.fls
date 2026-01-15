@@ -371,6 +371,14 @@ INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/base/omlcmr.fd
 INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/base/omlcmr.fd
 INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/base/omlcmr.fd
 INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/cm/cmtt10.tfm
+INPUT ./lectures/lecture03.tex
+INPUT ./lectures/lecture03.tex
+INPUT lectures/lecture03.tex
+INPUT ./figures/blindSignaturesAbstraction.jpg
+INPUT ./figures/blindSignaturesAbstraction.jpg
+INPUT ./figures/blindSignaturesAbstraction.jpg
+INPUT ./figures/blindSignaturesAbstraction.jpg
+INPUT ./figures/blindSignaturesAbstraction.jpg
 INPUT main.aux
 INPUT ./main.out
 INPUT ./main.out

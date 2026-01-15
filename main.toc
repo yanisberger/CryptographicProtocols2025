@@ -9,3 +9,12 @@
 \contentsline {subsection}{\numberline {2.2}Mathematics of public key Cryptography}{7}{subsection.2.2}%
 \contentsline {subsection}{\numberline {2.3}Public Key Encryption}{8}{subsection.2.3}%
 \contentsline {subsection}{\numberline {2.4}ElGamal public-key encryption}{9}{subsection.2.4}%
+\contentsline {section}{\numberline {3}Lecture 3}{10}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Digital Signatures}{10}{subsection.3.1}%
+\contentsline {subsubsection}{\numberline {3.1.1}Signature Scheme}{10}{subsubsection.3.1.1}%
+\contentsline {subsubsection}{\numberline {3.1.2}Schnorr Signatures}{10}{subsubsection.3.1.2}%
+\contentsline {subsection}{\numberline {3.2}RSA Signatures}{11}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}Blind Signatures}{11}{subsection.3.3}%
+\contentsline {subsubsection}{\numberline {3.3.1}Blind RSA Signatures}{12}{subsubsection.3.3.1}%
+\contentsline {subsection}{\numberline {3.4}Blind Schnorr Signatures}{13}{subsection.3.4}%
+\contentsline {subsection}{\numberline {3.5}Anonymous Digital Cash Scheme}{14}{subsection.3.5}%

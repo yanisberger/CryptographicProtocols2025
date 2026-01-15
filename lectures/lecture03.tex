@@ -1,0 +1,380 @@
+\section{Lecture 3}
+
+\subsection{Digital Signatures}
+
+Provides:
+\begin{itemize}
+\item Integrity
+\item Authenticity
+\item Non-repudiation
+\end{itemize}
+
+\subsubsection{Signature Scheme}
+
+\begin{itemize}
+\item $\mathsf{KeyGen}() \to (pk, sk)$
+\item $\Sign(sk, m) \to \sigma$
+\item $\Verify(pk, m, \sigma) \to 0/1$
+\end{itemize}
+
+\textbf{Completeness:}
+
+$\forall m: (pk, sk) \gets \mathsf{KeyGen}()$
+
+\hspace{1cm} $\Verify(pk, m, \Sign(sk, m)) = 1$ (TRUE)
+
+\textbf{Security:}
+
+\begin{itemize}
+\item $(pk, sk) \gets \mathsf{KeyGen}()$
+\item Adversary $\Adv$ obtains $pk$, can request repeatedly:
+\begin{itemize}
+\item $\sigma \gets \Sign(sk, m)$ for $m$ chosen by $\Adv$
+\end{itemize}
+\item Let $M$ be the set of $m$ asked by $\Adv$
+\item $\Adv$ cannot output $(m^*, \sigma^*)$ such that $m^* \in M$ $\land$ $\Verify(pk, m^*, \sigma^*) = 1$
+\end{itemize}
+
+\subsubsection{Schnorr Signatures}
+
+Very Important Signature Scheme based on the hardness of the discrete logarithm problem \& its associated assumptions.
+
+\noindent Recall: $G = \langle g \rangle$ \\
+$|G| = q$ \\
+$G \in \Z_p^*$, where $p = nq + 1$
+
+\vspace{0.5cm}
+
+\noindent
+\begin{minipage}[t]{0.3\textwidth}
+\underline{$\mathsf{KeyGen}()$}
+
+$x \xleftarrow{\R} \Z_q$
+
+$y \gets g^x$
+
+\underbar{return} $(y, x)$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.3\textwidth}
+\underline{$\Sign(x, m)$}
+
+$r \xleftarrow{\R} \Z_q$
+
+$t \gets g^r$
+
+$c \gets H(m \| g^s \cdot y^c)$ (challenge)
+
+$s \gets r - c \cdot x$ (signature)
+
+\underbar{return} $(c, s)$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.3\textwidth}
+\underline{$\Verify(y, m, (c,s))$}
+
+return $c \stackrel{?}{=} H(m \| g^s \cdot y^c)$
+\end{minipage}
+
+\subsubsection*{Completeness}
+
+Ensure that argument to $H()$ is same:
+
+$$g^s \cdot y^c = g^{r-c \cdot x} \cdot g^{xc} = g^r \cdot g^{-c} = g^r = t$$
+
+\subsubsection*{Security}
+
+One can prove this is secure under the DL assumption, in Random Oracle Model
+
+\subsection{RSA Signatures}
+
+$N = pq$, two primes $p$ and $q$
+
+\noindent $\Z_N$ compute modulo $N$
+
+\noindent $|\Z_N^*| = \varphi(N) = (p-1)(q-1)$
+
+\hspace{2cm} $\hookrightarrow$ Euler function
+
+\noindent \textbf{Euler's theorem:}
+
+\noindent For all $m \in \Z_N^*$: $m^{\varphi(N)} \bmod N = 1$. Without factoring $N$, inverting exponentiation modulo $N$ seems difficult.
+
+\vspace{0.5cm}
+
+\noindent
+\begin{minipage}[t]{0.45\textwidth}
+\underline{$\mathsf{KeyGen}()$}
+
+$p, q \gets$ random primes
+
+$N \gets pq$
+
+$e$ fixed prime, small, coprime to $p-1, q-1$
+
+$d \gets e^{-1} \bmod{\varphi(N)}$ \hspace{1cm} $\exists l: d \cdot e = 1 + l \cdot \varphi(N)$
+
+\underbar{return} $((N,e),d)$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.45\textwidth}
+\underline{$\Sign(d, m)$}
+
+$\sigma \gets H(m)^d$ where $H: \bits^* \to \Z_N$ (modeled as Random Oracle Model)
+
+\underline{return} $\sigma$
+\end{minipage}
+
+\vspace{0.5cm}
+
+\noindent
+\begin{minipage}[t]{0.45\textwidth}
+\underline{$\Verify((N,e), m, \sigma)$}
+
+return $\sigma^e \stackrel{?}{=} H(m)$ (mod $N$)
+\end{minipage}
+
+\subsection{Blind Signatures}
+Protocol between user $A$ and signer $B$ to issue a digital Signature, $A$ inputs message $m$, $B$ signs $m$ without learning $m$, Signature verifies as an ordinary signature.
+
+\vspace{0.5cm}
+
+\begin{center}
+    \includegraphics[width=0.8\textwidth]{figures/blindSignaturesAbstraction.jpg}
+    \end{center}
+\vspace{0.5cm}
+
+\begin{itemize}
+\item $B$ must not learn any $m$ it signs
+\item $B$ learns how many times it signs
+\item Signature itself unforgeable
+\end{itemize}
+
+\subsubsection{Blind RSA Signatures}
+
+Ordinary RSA Signatures do not hide $m$ properly with $H(m)$ because adversary $B$ could distinguish $H(m)$ from $H(m')$
+
+This protocol hides $m$
+
+\begin{itemize}
+\item $\mathsf{KeyGen}()$ as before
+\item $\Verify()$ as before
+\end{itemize}
+
+\textbf{Sign:}
+
+\vspace{0.5cm}
+
+\noindent
+\begin{minipage}[t]{0.3\textwidth}
+\underline{$A(N,e = m)$}
+
+$r \xleftarrow{\R} \Z_p$
+
+$\hat{h} \gets r^e \cdot H(m) \bmod{N}$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.3\textwidth}
+\underline{$B(d)$}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.3\textwidth}
+\underline{$V(N,e)$}
+\end{minipage}
+
+\vspace{0.5cm}
+
+\hspace{1cm}$\xrightarrow{\hspace{2cm} \hat{h} \hspace{2cm}}$
+
+\vspace{0.3cm}
+
+\hspace{5cm}$\bar{s} \gets \hat{h}^d \bmod{N}$
+
+\vspace{0.3cm}
+
+\hspace{1cm}$\xleftarrow{\hspace{2cm} \bar{s} \hspace{2cm}}$
+
+\vspace{0.5cm}
+
+\noindent
+\begin{minipage}[t]{0.45\textwidth}
+$s \gets \bar{s}/r \bmod{N}$
+
+s is a RSA signature on $H(m)$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.45\textwidth}
+    \vspace{1cm}  
+    \hspace{-8cm}$\xrightarrow{\hspace{4cm} (m,s) \hspace{4cm}}$ $s^e \stackrel{?}{\equiv} H(m) \pmod{N}$
+\end{minipage}
+
+\subsubsection*{Completeness}
+
+$$s^e = \bar{s}^e \cdot r^{-e} = \hat{h}^{de} \cdot r^{-e} \equiv \hat{h} \cdot r^{e}$$
+$$\equiv r^e \cdot H(m) \cdot r^{-e} \equiv H(m) \pmod{N}$$
+
+\subsubsection*{Blindness}
+
+\begin{itemize}
+\item $B$ signs a random value in $\Z_N$
+\item Signature allows no correlation with signing operation
+\end{itemize}
+
+\subsubsection*{Security}
+
+Same as ordinary RSA signature
+
+\subsection{Blind Schnorr Signatures} \hfill $\Verify(pk, m, \sigma) \to 0/1$
+
+\begin{itemize}
+\item $\mathsf{KeyGen}() \to (pk, sk)$ same as before
+\end{itemize}
+
+\textbf{Signing Protocol:}
+
+\vspace{0.5cm}
+
+\noindent
+\begin{minipage}[t]{0.3\textwidth}
+\underline{$A(m)$}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.3\textwidth}
+\underline{$B(x)$}
+
+$r \xleftarrow{R} \Z_q$
+
+$t \gets g^r$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.3\textwidth}
+\underline{$V(y)$}
+\end{minipage}
+
+\vspace{0.5cm}
+
+\hspace{1cm}$\xleftarrow{\hspace{2cm} t \hspace{2cm}}$
+
+\vspace{0.5cm}
+
+\noindent
+\begin{minipage}[t]{0.45\textwidth}
+$\alpha, \beta \xleftarrow{R} \Z_q$ \\
+\hspace{0.5cm} $\hookrightarrow$ blinding factors
+
+$\bar{t} \gets t \cdot g^{-\alpha} \cdot y^{-\beta} \in G$ \\
+
+$\bar{c} \gets H(m \| \bar{t})$
+
+$c \gets (\bar{c} + \beta) \bmod{q}$
+\end{minipage}
+
+\vspace{0.5cm}
+
+\hspace{1cm}$\xrightarrow{\hspace{2cm} c \hspace{2cm}}$ $S \gets r - c \cdot x \bmod{q}$
+
+\vspace{0.5cm}
+
+\hspace{1cm}$\xleftarrow{\hspace{2cm} S \hspace{2cm}}$
+
+\vspace{0.5cm}
+
+\noindent
+\begin{minipage}[t]{0.45\textwidth}
+$\bar{s} \gets (S - \alpha) \bmod{q}$
+
+\underbar{return} $(\bar{c}, \bar{s})$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.45\textwidth}
+\vspace{1cm}
+\hspace{-8cm}$\xrightarrow{\hspace{4cm} (\bar{c}, \bar{s}, m) \hspace{4cm}}$ $\Verify(y, m, (\bar{c}, \bar{s}))$
+
+$\bar{c} \stackrel{?}{=} H(m \| g^{\bar{s}} \cdot y^{\bar{c}})$, where $g^{\bar{s}} \cdot y^{\bar{c}}$ = $\hat{t}$
+
+\end{minipage}
+
+\subsubsection*{Completeness}
+
+Show that $\hat{t} = \bar{t}$:
+
+\begin{align*}
+\hat{t} &= g^{\bar{s}} \cdot y^{\bar{c}} = g^{s-\alpha}\cdot g^{x\bar{c}} = g^{r-cx-\alpha}\cdot g^{x\cdot(c-\beta)}\\
+&= g^{r-c \cdot x - \alpha + x \cdot c - x \cdot \beta} = g^{r- \alpha - x\cdot \beta} = g^{r-\alpha} \cdot y^{- \beta} \\
+&= g^{r} \cdot g^{- \alpha} \cdot y^{- \beta} = t \cdot g^{-\alpha} \cdot y^{- \beta} = \bar{t} \in \Z_q
+\end{align*}
+
+\subsubsection*{Blindness}
+
+\begin{itemize}
+\item $B$ sees only $H(m \| \hat{t})$ but F random
+\item $B$/$V$ see signature $(\bar{c}, \bar{s})$ but during Protocol see only $(c,s)$, and $(c,s)$ are, for random $\alpha, \beta$:
+\end{itemize}
+
+$$\bar{c} = c - \beta$$
+$$\bar{s} = s - \alpha$$
+
+- This hides $c,s$ as in a OTP (Oblivious Transfer Protocol)
+
+\subsubsection*{Security}
+
+Same as for Schnorr
+
+\subsection{Anonymous Digital Cash Scheme}
+
+D. Chaum, 1985
+
+\begin{itemize}
+\item User Alice: wallet with coins
+\item Shop $S$: receives coins
+\item Bank $B$: creates coins \\
+\hspace{2cm} stores balance for $A$
+\end{itemize}
+
+\textbf{Withdraw:}
+
+Denomination: $u$
+
+\vspace{0.3cm}
+
+\begin{center}
+User $A$
+
+$\downarrow$
+
+Bank $B$
+\end{center}
+
+User $A$: $m \xleftarrow{R} \bits^k$ coin identifier
+
+\hspace{1cm} send $(m,u)$ to $B$
+
+Bank $B$: - runs the blind-sig-protocol with $B$ with $A$'s input being $m$
+
+User $A$ obtains blind Signature $\sigma$ on $m$
+
+\vspace{0.5cm}
+
+Bank $B$: $\text{balance}_A \gets \text{balance}_A - u$
+
+\textbf{Spend:}
+
+User $A$ sends $(m, \sigma)$ to $S$
+
+Shop verifies that $\sigma$ is a valid signature on $m$
+
+\textbf{Deposit:}
+
+\begin{itemize}
+\item Shop goes to $B$, sends $(m, \sigma)$
+\item Verify that $\sigma$ is a valid signature on $m$
+\item If $B$ has not credited $m$ before, then:
+\begin{itemize}
+\item Bank credits $u$ to account of $S$
+\item $\text{bal}_S \gets \text{bal}_S + u$
+\end{itemize}
+\item Bank tells $S$ that coin is valid
+\item Shop performs service
+\end{itemize}
+
+$\longrightarrow$ spending must be online
