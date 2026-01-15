@@ -1,0 +1,280 @@
+\section{Lecture 1}
+
+\subsection{Overview of what the course will cover}
+
+\begin{itemize}
+\item Computing with encrypted data
+\item AuthN without giving away any secret
+\item E-voting / cryptographic voting protocols
+\item Blockchain is transparent, cannot keep secrets
+\item Generate a true random \& unbiased value
+\item Sealed bid auction w/o trusted entity
+\end{itemize}
+
+\subsection{Example: Generate a random bit (coin flip)}
+
+Needs cryptography to ensure that the output is not biased among two parties A and B, since the party that sends the last message can precompute/bias the output
+
+Use cryptography: Simultaneous commitments
+\begin{itemize}
+\item hash the message, send it
+\item We add randomness as mashing bit
+\item hash functions are collision-free: No two inputs give the same output
+\item output gives no info about the input
+\end{itemize}
+
+Hash func $H$:
+\[ H: \bits^* \to \bits^k \]
+
+SHA-2: $k = 256$ as a special case of a commitment scheme
+
+\subsubsection*{Protocol}
+
+\noindent
+\begin{minipage}[t]{0.45\textwidth}
+\underline{A}
+
+$a \xleftarrow{\R} \bits$
+
+$x \xleftarrow{\R} \bits^k$
+
+$c \gets H(a \| x)$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.45\textwidth}
+\underline{B}
+
+$b \xleftarrow{\R} \bits$
+
+$y \xleftarrow{\R} \bits^k$
+
+$d \gets H(b \| y)$
+\end{minipage}
+
+\vspace{0.5cm}
+
+\vspace{0.5cm}
+\hspace{3cm}$\xrightarrow{\hspace{2cm} c \hspace{2cm}}$
+
+\hspace{3cm}$\xleftarrow{\hspace{2cm} d \hspace{2cm}}$
+
+\hspace{3cm}$\xrightarrow{\hspace{2cm} a, x \hspace{2cm}}$
+
+\hspace{3cm}$\xleftarrow{\hspace{2cm} b, y \hspace{2cm}}$
+
+\vspace{0.5cm}
+
+\noindent
+\begin{minipage}[t]{0.45\textwidth}
+verify $d \stackrel{?}{=} H(b \| y)$
+
+\vspace{0.3cm}
+
+\underbar{output $a \oplus b$}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.45\textwidth}
+verify $c \stackrel{?}{=} H(a \| x)$
+
+\vspace{0.3cm}
+
+output $a \oplus b$
+\end{minipage}
+
+\vspace{0.5cm}
+
+$\tilde{b}$, $\tilde{y} \Rightarrow$ not possible as this would violate collision-freeness
+
+\begin{itemize}
+\item $c$ and $d$ hide $a$ \& $b$, because this hash function hides its input.
+\item $A$ \& $B$ cannot change their inputs because $H$ is collision free
+\end{itemize}
+
+$\longrightarrow$ Find out how exactly this gives a random bit
+
+\subsection{Example: Millionaires' Problem}
+
+$A$ and $B$ want to find out who is richer without disclosing their wealth
+
+\begin{tabular}{ll}
+$A(x)$ & $B(y)$ \\
+\end{tabular}
+
+output $x \geq y$ \hspace{2cm} output $x \geq y$
+
+This is easy with a trusted entity $T$.
+
+\begin{center}
+$A \longrightarrow |T| \longleftarrow B$ \\
+$b \gets (x \geq y)$
+\end{center}
+
+\textbf{We want to hide as much as we can}
+
+Important example for:
+\begin{itemize}
+\item Auctions
+\item Matchings
+\item Elections $\longrightarrow$ solution comes later
+\end{itemize}
+
+\subsection*{Ex: Computing with encrypted data}
+
+\begin{tabular}{ll}
+$A(x)$ & $B(f)$ \\
+user & cloud \\
+input $x$ (data) & function $f$ \\
+\end{tabular}
+
+Encryption scheme $(\Enc, \Dec)$ with keypair $(pk, sk)$
+
+$c_x \gets \Enc(pk, x)$
+
+Send $pk$, $c_x$ $\longrightarrow$
+
+\hspace{3cm} $c_y \gets \text{Eval}(pk, f, c_x)$
+
+\hspace{3cm} Eval ``runs'' program $f$ on data $x$
+
+\hspace{3cm} encrypt inside $c_x$
+
+$\longleftarrow$ $c_y$
+
+$y \gets \Dec(sk, c_y)$
+
+s.t. \quad $y = \Dec(sk, \text{Eval}(pk, f, \Enc(pk, x))) = f(x)$
+
+\subsubsection*{Why is computing on secret data difficult?}
+
+Layers
+
+\begin{tabular}{|c|}
+\hline
+App \\
+\hline
+VMs \\
+\hline
+Containers \\
+\hline
+OS \\
+\hline
+Hypervisor \\
+\hline
+Base OS \\
+\hline
+Hardware \\
+\hline
+\end{tabular}
+\hspace{1cm}
+\begin{tabular}{|c|}
+\hline
+high TCB \\
+(Trusted Computer Base) \\
+\hline
+\end{tabular}
+
+see $\uparrow$ lower levels can see everything above them \\
+can always see what happens on higher levels
+
+$\longrightarrow$ cc: lower levels can see everything above them
+
+TCB controls everything
+
+\subsection{Ex: Secret vote among three}
+
+Parties $p_1, p_2, p_3$
+
+Each has a binary vote $v_i$ as input. Goal is to compute the sum $s$ of the votes and not disclose any more information than that.
+
+\subsubsection*{Protocol: Additive secret sharing}
+
+Primitive: $\text{split}(b) \to (x_1, x_2, x_3)$ to distribute or ``share'' $b$
+
+Use prime $p$
+
+$\text{split}(b)$: $\{0,1,2,...,p-1\}$
+
+\hspace{1cm} $x_1 \xleftarrow{\$} \Z_p$ \\
+\hspace{1cm} $x_2 \xleftarrow{\$} \Z_p$ \\
+\hspace{1cm} $x_3 \xleftarrow{\$} \Z_p$ s.t. $x_1 + x_2 + x_3 \equiv b \pmod{p}$ \\
+\hspace{1cm} return $(x_1, x_2, x_3)$
+
+\begin{center}
+secure channel: confidential \& authenticated
+
+\begin{tikzpicture}
+\node (P1) at (0,0) {$P_1$};
+\node (P2) at (2,2) {$P_2$};
+\node (P3) at (4,0) {$P_3$};
+\draw (P1) -- (P2);
+\draw (P2) -- (P3);
+\draw (P1) -- (P3);
+\end{tikzpicture}
+\end{center}
+
+Party $p_i(v_i)$:
+
+$(x_{i1}, x_{i2}, x_{i3}) \gets \text{split}(v_i)$
+
+send $x_{ij}$ to $p_j$ for $j \in \{1,2,3\}$
+
+receive $x_{ji}$ from $p_j$
+
+$y_i \gets (x_{1i} + x_{2i} + x_{3i}) \bmod{p}$
+
+send $y_i$ to $p_j$ for $j \neq i,...,3$
+
+receive $y_j$ from $p_j$
+
+output $(y_1 + y_2 + y_3) \bmod{p}$
+
+\subsubsection*{Completeness}
+
+claim: $s \equiv v_1 + v_2 + v_3$
+
+Proof:
+\begin{align*}
+s &= \sum_{i=1}^{3} y_i \\
+&= \sum_{i=1}^{3} \left(\sum_{j=1}^{3} x_{ji}\right) \\
+&= \sum_{j=1}^{3} \left(\sum_{i=1}^{3} x_{ji}\right) & \text{(columns sum)} \\
+&= \sum_{j=1}^{3} (x_{j1} + x_{j2} + x_{j3}) & \text{(rows sum)} \\
+& & v_j \text{ to } \text{split}() \\
+&= \sum_{j=1}^{3} v_j \pmod{p}
+\end{align*}
+
+\subsection*{Security}
+
+$\text{split}(b) \to (x_1, x_2, x_3)$
+
+No two values of $x_i, x_j$ give information about $b$
+
+(Generation of a one time pad)
+
+Output $s$ reveals nothing more than it should: nothing about $v_j$ for $j \neq i$; only $s$.
+
+\subsubsection*{Goals}
+
+\textbf{Privacy:} No party learns more than it should (the output)
+
+\textbf{Correctness:} Every party receives the output as specified by the function they are evaluating
+
+\textbf{Input Independence:} Inputs of corrupted or faulty parties do not depend on input of correct parties.
+
+\textbf{Fairness:} All parties either receive an output or no party receives an output \\
+$\longrightarrow$ faulty parties receive outputs if and only if correct parties receive output
+
+\subsubsection*{Faults}
+
+All faulty parties are modeled as controlled (or corrupted) by one adversary $\Adv$.
+
+\textbf{semi-honest behaviour}
+\begin{itemize}
+\item Corrupted parties follow protocol
+\item Leak all data to $\Adv$
+\item ``passive attack'', ``passive adversary'', ``read-only attack''
+\end{itemize}
+
+\textbf{Malicious behaviour}
+\begin{itemize}
+\item Faulty parties behave arbitrarily, controlled by $\Adv$
+\end{itemize}
