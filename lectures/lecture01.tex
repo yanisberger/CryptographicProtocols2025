@@ -18,7 +18,7 @@ Needs cryptography to ensure that the output is not biased among two parties A a
 Use cryptography: Simultaneous commitments
 \begin{itemize}
 \item hash the message, send it
-\item We add randomness as mashing bit
+\item We add randomness as hashing bit
 \item hash functions are collision-free: No two inputs give the same output
 \item output gives no info about the input
 \end{itemize}
@@ -78,7 +78,7 @@ verify $c \stackrel{?}{=} H(a \| x)$
 
 \vspace{0.3cm}
 
-output $a \oplus b$
+\underbar{output} $a \oplus b$
 \end{minipage}
 
 \vspace{0.5cm}
@@ -90,23 +90,56 @@ $\tilde{b}$, $\tilde{y} \Rightarrow$ not possible as this would violate collisio
 \item $A$ \& $B$ cannot change their inputs because $H$ is collision free
 \end{itemize}
 
-$\longrightarrow$ Find out how exactly this gives a random bit
+%TODO:$\longrightarrow$ Find out how exactly this gives a random bit
 
-\subsection{Example: Millionaires' Problem}
+\subsection*{Ex: Millionaires' Problem}
 
 $A$ and $B$ want to find out who is richer without disclosing their wealth
 
-\begin{tabular}{ll}
-$A(x)$ & $B(y)$ \\
-\end{tabular}
+\vspace{0.5cm}
 
-output $x \geq y$ \hspace{2cm} output $x \geq y$
+\begin{minipage}[t]{0.45\textwidth}
+    \underline{A(x)}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.45\textwidth}
+    \underline{B(x)}
+    \end{minipage}
+    
+    \vspace{0.5cm}
+    
+    \vspace{0.5cm}
+    \hspace{3cm}$\xrightarrow{\hspace{2cm} \hspace{2cm}}$
+    
+    \hspace{3cm}$\xleftarrow{\hspace{2cm} \hspace{2cm}}$
+    
+    \hspace{3cm}$\xrightarrow{\hspace{2cm} \hspace{2cm}}$
+    
+    \hspace{3cm}$\xleftarrow{\hspace{2cm} ... \hspace{2cm}}$
+    
+    \vspace{0.5cm}
+    
+    \noindent
+    \begin{minipage}[t]{0.45\textwidth}    
+    \underbar{output $x \stackrel{?}{\geq} y$}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.45\textwidth}
+    \underbar{output $x \stackrel{?}{\geq} y$}
+    \end{minipage}
 
-This is easy with a trusted entity $T$.
+\vspace{0.5cm}
+
+This is easy with a trusted entity $T$:
 
 \begin{center}
-$A \longrightarrow |T| \longleftarrow B$ \\
-$b \gets (x \geq y)$
+$A \xrightarrow{\hspace{2cm}} \boxed{T} \xleftarrow{\hspace{2cm}} B$
+
+$b \gets (x \stackrel{?}{\geq} y)$
+
+\vspace{0.3cm}
+
+$\xleftarrow{\hspace{1cm} b \hspace{1cm}}$ \hspace{2cm} $\xrightarrow{\hspace{1cm} b \hspace{1cm}}$
 \end{center}
 
 \textbf{We want to hide as much as we can}
@@ -148,35 +181,33 @@ s.t. \quad $y = \Dec(sk, \text{Eval}(pk, f, \Enc(pk, x))) = f(x)$
 
 Layers
 
-\begin{tabular}{|c|}
-\hline
-App \\
-\hline
-VMs \\
-\hline
-Containers \\
-\hline
-OS \\
-\hline
-Hypervisor \\
-\hline
-Base OS \\
-\hline
-Hardware \\
-\hline
-\end{tabular}
-\hspace{1cm}
-\begin{tabular}{|c|}
-\hline
-high TCB \\
-(Trusted Computer Base) \\
-\hline
-\end{tabular}
+\begin{tabular}[t]{|c|}
+    \hline
+    App \\
+    \hline
+    VMs \\
+    \hline
+    Containers \\
+    \hline
+    OS \\
+    \hline
+    Hypervisor \\
+    \hline
+    Base OS \\
+    \hline
+    Hardware \\
+    \hline
+    \end{tabular}
+    \hspace{1cm}
+    \begin{tabular}[t]{|c|}
+    \hline
+    \parbox[c][1.75cm][c]{3cm}{\centering high: \\ Trusted Platform Module (TPM) } \\
+    \hline
+    \parbox[c][1.75cm][c]{3cm}{\centering TCB \\ Trusted Computer Base } \\
+    \hline
+    \end{tabular}
 
-see $\uparrow$ lower levels can see everything above them \\
-can always see what happens on higher levels
-
-$\longrightarrow$ cc: lower levels can see everything above them
+\textbf{lower levels can always see everythin that happens on higher levels/above them}
 
 TCB controls everything
 
@@ -192,12 +223,16 @@ Primitive: $\text{split}(b) \to (x_1, x_2, x_3)$ to distribute or ``share'' $b$
 
 Use prime $p$
 
-$\text{split}(b)$: $\{0,1,2,...,p-1\}$
+\vspace{0.5cm}
 
-\hspace{1cm} $x_1 \xleftarrow{\$} \Z_p$ \\
-\hspace{1cm} $x_2 \xleftarrow{\$} \Z_p$ \\
-\hspace{1cm} $x_3 \xleftarrow{\$} \Z_p$ s.t. $x_1 + x_2 + x_3 \equiv b \pmod{p}$ \\
-\hspace{1cm} return $(x_1, x_2, x_3)$
+\noindent \underbar{$\text{split}(p)$}: $\{0,1,2,...,p-1\}$
+
+\vspace{0.5cm}
+
+\noindent $x_1 \xleftarrow{} \Z_p$ \\
+$x_2 \xleftarrow{} \Z_p$ \\
+$x_3 \xleftarrow{} \Z_p$ s.t. $x_1 + x_2 + x_3 \equiv b \pmod{p}$ \\
+return $(x_1, x_2, x_3)$
 
 \begin{center}
 secure channel: confidential \& authenticated
@@ -216,17 +251,19 @@ Party $p_i(v_i)$:
 
 $(x_{i1}, x_{i2}, x_{i3}) \gets \text{split}(v_i)$
 
-send $x_{ij}$ to $p_j$ for $j \in \{1,2,3\}$
+\underbar{send} $x_{ij}$ to $p_j$ for $j \in \{1,2,3\}$
 
-receive $x_{ji}$ from $p_j$
+\underbar{receive} $x_{ji}$ from $p_j$
 
 $y_i \gets (x_{1i} + x_{2i} + x_{3i}) \bmod{p}$
 
-send $y_i$ to $p_j$ for $j \neq i,...,3$
+\underbar{send} $y_i$ to $p_j$ for $j \neq i,...,3$
 
-receive $y_j$ from $p_j$
+\underbar{receive} $y_j$ from $p_j$
 
-output $(y_1 + y_2 + y_3) \bmod{p}$
+\underbar{output} $(y_1 + y_2 + y_3) \bmod{p}$
+
+where $(y_1 + y_2 + y_3)$ = s
 
 \subsubsection*{Completeness}
 
@@ -256,25 +293,25 @@ Output $s$ reveals nothing more than it should: nothing about $v_j$ for $j \neq 
 
 \textbf{Privacy:} No party learns more than it should (the output)
 
-\textbf{Correctness:} Every party receives the output as specified by the function they are evaluating
+\noindent \textbf{Correctness:} Every party receives the output as specified by the function they are evaluating
 
-\textbf{Input Independence:} Inputs of corrupted or faulty parties do not depend on input of correct parties.
+\noindent \textbf{Input Independence:} Inputs of corrupted or faulty parties do not depend on input of correct parties.
 
-\textbf{Fairness:} All parties either receive an output or no party receives an output \\
+\noindent \textbf{Fairness:} All parties either receive an output or no party receives an output \\
 $\longrightarrow$ faulty parties receive outputs if and only if correct parties receive output
 
 \subsubsection*{Faults}
 
 All faulty parties are modeled as controlled (or corrupted) by one adversary $\Adv$.
 
-\textbf{semi-honest behaviour}
+\noindent \textbf{semi-honest behaviour}
 \begin{itemize}
 \item Corrupted parties follow protocol
 \item Leak all data to $\Adv$
 \item ``passive attack'', ``passive adversary'', ``read-only attack''
 \end{itemize}
 
-\textbf{Malicious behaviour}
+\noindent \textbf{Malicious behaviour}
 \begin{itemize}
 \item Faulty parties behave arbitrarily, controlled by $\Adv$
 \end{itemize}

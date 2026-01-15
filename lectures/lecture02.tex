@@ -1,0 +1,270 @@
+\section{Lecture 2}
+
+Consider Programs formulated as circuits.
+
+\begin{itemize}
+\item Finite state automata (Turing machines)
+\item Circuits
+\item stack automata
+\end{itemize}
+
+\noindent What can be computed on one can be computed on all \\
+$\Longrightarrow$ For this course, consider circuits.
+
+\subsection{Basic technique}
+
+\subsubsection{Programs as circuits}
+
+Every program on inputs $x_1, ..., x_n$ computes a function $f(x_1, ..., x_n)$, represented by a Turing machine or by a circuit.
+
+\noindent \textbf{Deterministic vs. Non-Deterministic Turing Machine:}
+
+TODO: add this
+
+\noindent Polynomial-time: $O(n^k) \approx$ Polynomial time, so the run time depends on the input size in a polynomial relation.
+
+\textbf{Cook-Levin Theorem:} $NP \stackrel{?}{=} P$
+
+Every problem decided by a non-deterministic Turing Machine (= NP-problem) in Polynomial time can be formulated as the satisfiability problem (SAT) of a polynomial-size (boolean) circuit.
+
+$\Longrightarrow$ One time use circuits, not circuits with clocks.
+
+In every computer the CPU represents computations as stateful circuits.
+
+Here we will represent any computation as a circuit and evaluate the circuit in ``encrypted'' form.
+
+\subsubsection{Circuit for testing if two numbers are equal}
+
+Given two numbers in binary. \\
+$(x)_2 = (x_{n-1}, ..., x_0)$ \\
+$(y)_2 = (y_{n-1}, ..., y_0)$
+
+To compute if $x \stackrel{?}{=} y$
+
+\begin{lstlisting}[mathescape]
+    i $\gets$ n
+    while i > 0 do
+        i $\gets$ i-1
+        if $x_i \neq y_i$ then
+            return FALSE
+    return TRUE
+ \end{lstlisting}
+
+In the circuit one has to unroll all loops and eliminate imperative operations.
+
+\textbf{Circuit:}
+
+\begin{lstlisting}[mathescape, basicstyle=\ttfamily]
+    i $\gets$ n
+    $d_n \gets 0$
+    while i > 0 do
+        i $\gets$ i-1
+        $d_i \gets d_{i+1} \lor (x_i \oplus y_i)$
+    return $\lnot d_0$
+\end{lstlisting}
+
+Circuit: $O(n)$ complexity
+
+\begin{center}
+\begin{tikzpicture}[scale=0.8]
+% Input wires
+\node at (0,4) {$x_{n-1}$};
+\node at (1,4) {$y_{n-1}$};
+\node at (3,4) {...};
+\node at (4,4) {$x_1$};
+\node at (5,4) {$y_1$};
+\node at (7,4) {...};
+\node at (8,4) {$x_0$};
+\node at (9,4) {$y_0$};
+
+% XOR gates
+\draw (0.5,3) circle (0.3) node {$\oplus$};
+\draw (4.5,3) circle (0.3) node {$\oplus$};
+\draw (8.5,3) circle (0.3) node {$\oplus$};
+
+% d_n label
+\node at (-1,2.5) {$d_n$};
+\draw[->] (-0.5,2.5) -- (0.5,2.5);
+
+% Vertical connections
+\draw (0.5,2.7) -- (0.5,2);
+\draw (4.5,2.7) -- (4.5,2);
+\draw (8.5,2.7) -- (8.5,2);
+
+% OR gates
+\draw (2,1.5) circle (0.3) node {$\lor$};
+\draw (6,0.5) circle (0.3) node {$\lor$};
+
+% d labels
+\node at (-1,1.5) {$d_{n-1}$};
+\node at (-1,0.5) {$d_{n+1}$};
+\node at (-1,-0.5) {$d_1$};
+
+% Final output
+\draw (8.5,-1.5) circle (0.3) node {$\lor$};
+\draw (8.5,-2.5) circle (0.3) node {$\lnot$};
+\node at (-1,-2.5) {$d_0$};
+\node at (8.5,-3.5) {(result)};
+
+\end{tikzpicture}
+\end{center}
+
+\subsection{Mathematics of public key Cryptography}
+
+\subsubsection*{Modular Arithmetic: ``computing modulo $m$''}
+
+$x \gets a \bmod{m}$ (operation) \\
+$x \equiv a \pmod{m}$ (Relation, can be true/false)
+
+$\Z_m = \{0, ..., m-1\}$ with addition modulo $m$
+
+$\Z_m^* = \{1, ..., m-1\}$ with multiplication modulo $m$, typically $m$ is $p$, prime.
+
+\subsubsection*{Cyclic groups}
+
+A cyclic group $G$ has a generator $g \in G$ s.t. every element of $G$ is obtained by computing $g^i$ for $i=0,1,...$
+
+$$g^0 = 1$$
+
+$G$ is finite and has $|G|$ elements: $G = \{1, g, g^2, ..., g^{|G|-1}\}$
+
+because $g^{|G|} = g^0 = 1$
+
+write $\langle g \rangle = G$ (generator)
+
+\begin{itemize}
+\item $\Z_m$ with addition operation is cyclic with $g=1$
+\item $\Z_p^*$ with multiplication is cyclic with $|\Z_p^*| = p-1$
+\end{itemize}
+
+Ex: $\Z_{11}^*$
+
+$\langle 2 \rangle_{11} = \{1,2,4,8,5,10,9,7,3,6\}$
+
+$\langle 3 \rangle_{11} = \{1,3,9,5,4,...\}$ only a subgroup
+
+
+\vspace{0.5cm}
+
+if $q \mid p-1$ is also prime then there is a cyclic subgroup with $q$ elements, defined by multiplication modulo $p$ $\Rightarrow$ used in cryptography
+
+with $|p|$ about 2000 bit
+
+and $|q|$ about 256 bit such that $p = nq + 1$
+
+or such that $p = 2q + 1$
+
+\hspace{2cm} $(|q| = |p| - 1)$
+
+\subsubsection*{Discrete logarithms}
+
+$G = \langle g \rangle$
+
+the discrete log of $a \in G$ with respect to (w.r.t.) base $g$ is the $l \in \Z_{|G|-1}$ s.t.
+
+$$g^l = a$$
+
+computing discrete logarithms is assumed to be hard (in some $G$) (computationally hard)
+
+\textbf{DLP: Discrete Logarithm Problem}
+
+Given $y$, where $\begin{cases} r \gets \Z_q \\ y \gets g^r \end{cases}$ \hspace{1cm} with public info or from key
+
+Find $r$.
+
+\noindent \textbf{Related: Computational Diffie-Hellman Problem}
+
+\noindent Given $x$ and $y$, where
+
+ \noindent $a \xleftarrow{\R} \Z_q$ \hspace{1cm} $b \xleftarrow{\R} \Z_q$ \\
+ \noindent $x \gets g^a$ \hspace{1cm} $y \gets g^b$
+
+Find $g^{ab}$ [$ \in G$]
+
+\subsubsection*{DDHP: Decisional DH Problem}
+
+Given either
+
+\begin{enumerate}
+\item $(x,y,z)$, where \\ \hspace{1cm} $a \gets \Z_q$ \hspace{1cm} $y \gets g^a$ \\
+\hspace{2.5cm} $b \gets \Z_q$ \hspace{1cm} $x \gets g^b$ \\
+\hspace{2.5cm} $c \gets \Z_q$ \hspace{1cm} $z \gets g^c$
+\end{enumerate}
+
+or
+
+\begin{enumerate}
+\setcounter{enumi}{1}
+\item $(x,y,z)$, where \\ \hspace{1cm} $a \gets \Z_q$ \hspace{1cm} $y \gets g^a$ \\
+\hspace{2.5cm} $b \gets \Z_q$ \hspace{1cm} $x \gets g^b$ \\
+\hspace{2.5cm} \hspace{1cm} $z \gets g^{ab}$
+\end{enumerate}
+
+Task is not compute $z$, but instead which Tripel \textcircled{1} or \textcircled{2} we have
+
+\subsection{Public Key Encryption}
+
+$\mathsf{KeyGen}() \to (pk, sk)$ \\
+$\Enc(pk, m) \to c$ \\
+$\Dec(sk, c) \to m$
+
+\subsubsection*{Completeness}
+
+$\forall m: (pk, sk) \gets \mathsf{KeyGen}()$ \\
+\hspace{1cm} $\Dec(sk, \Enc(pk, m)) = m$
+
+\subsubsection*{Security}
+
+\begin{itemize}
+\item An encryption of some message $m$ is indistinguishable from a random element of the ciphertext space.
+\item For two messages $m_1$ and $m_2$, no efficient adversary can distinguish $\Enc(pk, m_1)$ from $\Enc(pk, m_2)$ except with negligible probability.
+\end{itemize}
+
+$\Longrightarrow$ $\Enc(pk, m_1)$ is indistinguishable from $\Enc(pk, m_2)$
+
+\textbf{Security parameter:} $\lambda$
+
+$f(\cdot)$ is negligible if \hspace{1cm} %$\leftarrow$ Read in textbook: modern cryptography
+
+$$\exists \lambda_0 : \forall c > 0 : f(\lambda) < \frac{1}{\lambda^c} \text{ for } \lambda \geq \lambda_0$$
+
+\subsection{ElGamal public-key encryption}
+
+\begin{itemize}
+\item Textbook version
+\item Cyclic Group: $G = \langle g \rangle$, $|G| = q$
+\end{itemize}
+
+\noindent \underbar{$\mathsf{KeyGen}()$}
+
+\noindent $x \xleftarrow{} \Z_q$ \\
+ $y \gets g^x$ \\
+\underbar{return} $(y,x)$ \hspace{2cm} $y: pk$, $x: sk$
+\vspace{0.5cm}
+
+\noindent \underbar{$\Enc(y, m)$} \hspace{2cm} $m \in G$
+
+\hspace{1cm} $r \xleftarrow{R} \Z_q$ \\
+\hspace{1cm} $R \gets g^r$ \\
+\hspace{1cm} $c \gets y^r \cdot m$ \\
+\hspace{1cm} \underbar{return} $(R, c) \in G \times G$
+\vspace{0.5cm}
+
+\noindent \underbar{$\Dec(x, (R, c))$} \\
+\hspace{1cm} $\hat{m} \gets c / R^x$ \\
+\hspace{1cm} \underbar{return} $\hat{m}$
+
+$$\hat{m} = c/R^x = (y^r \cdot m) \cdot (g^{-r})^{x} = g^{xr} \cdot m \cdot g^{-rx} = m$$
+
+\subsubsection*{Security}
+
+Decide whether for some $m$, $(y, R, c)$ is $(g^x, g^r, m \cdot g^{xr})$ (DH exponent, independent)
+or $(y, R, c)$ is $(g^x, g^r, m \cdot g^z)$ for some $z \xleftarrow{\$} \Z_p$ 
+
+This is equivalent to the DDHP
+
+\vspace{1cm}
+
+%$\longrightarrow$ Gotta read some more on Signatures in Textbook for exercises.
+
+Digital Signature (DS) Scheme is pub key cryptography
